@@ -1,89 +1,92 @@
-from tkinter import Tk, Label, Scale, HORIZONTAL, Frame, Button
-import tkinter.font as FONT
-from gpiozero import PWMLED
+from tkinter import Tk, Label, Scale, HORIZONTAL, Frame, Button  # Import necessary Tkinter components for GUI
+import tkinter.font as FONT  # Import the font module from Tkinter
+from gpiozero import PWMLED  # Import PWMLED from gpiozero to control LED brightness using PWM
 
-# Set up PWM LEDs
-red = PWMLED(6)
-green = PWMLED(21)
-blue = PWMLED(16)
+# Set up PWM LEDs on GPIO pins
+red = PWMLED(6)    # Red LED connected to GPIO pin 6
+green = PWMLED(21)  # Green LED connected to GPIO pin 21
+blue = PWMLED(16)   # Blue LED connected to GPIO pin 16
 
-# Create main window
+# Create the main window for the GUI
 window = Tk()
-window.title("RGB LED Controller")
-window.configure(bg='#f0f0f0')  # Light gray background
+window.title("RGB LED Controller")  # Set window title
+window.configure(bg='#f0f0f0')  # Set the background color of the window to light gray
 
-# Define fonts
-title_font = FONT.Font(family='Helvetica', size=16, weight='bold')
-label_font = FONT.Font(family='Arial', size=12)
+# Define fonts for titles and labels
+title_font = FONT.Font(family='Helvetica', size=16, weight='bold')  # Font for the title
+label_font = FONT.Font(family='Arial', size=12)  # Font for the slider labels
 
-# Function to update LED values
+# Function to update the LED brightness based on slider value
 def update_color(slider, led):
-    value = int(slider.get()) / 100
-    led.value = value
+    value = int(slider.get()) / 100  # Get the slider value, scale it between 0 and 1 (PWM uses values from 0 to 1)
+    led.value = value  # Set the PWM LED value (brightness) based on the slider
 
-# Create main frame to hold content
-main_frame = Frame(window, padx=20, pady=20, bg='#f0f0f0')
-main_frame.pack(expand=True, fill='both')
+# Create a main frame to hold all the GUI content
+main_frame = Frame(window, padx=20, pady=20, bg='#f0f0f0')  # Add padding and background color to the frame
+main_frame.pack(expand=True, fill='both')  # Expand frame to fill available space
 
-# Title label
+# Title label for the window
 title_label = Label(main_frame, text="RGB LED Brightness Control", font=title_font, bg='#f0f0f0', fg='#333')
-title_label.pack(pady=(10, 20))
+# Set title text, font, and colors
+title_label.pack(pady=(10, 20))  # Add vertical padding around the title
 
-# Function to create sliders and labels
+# Function to create a slider with a label for each LED color
 def create_slider(label_text, led, update_function, fg_color):
-    slider_frame = Frame(main_frame, bg='#f0f0f0')
-    slider_frame.pack(pady=10)
+    slider_frame = Frame(main_frame, bg='#f0f0f0')  # Create a frame for the slider and label
+    slider_frame.pack(pady=10)  # Add padding around the slider frame
 
-    label = Label(slider_frame, text=label_text, font=label_font, fg=fg_color, bg='#f0f0f0')
-    label.pack(side='left', padx=10)
+    label = Label(slider_frame, text=label_text, font=label_font, fg=fg_color, bg='#f0f0f0')  # Label for the slider
+    label.pack(side='left', padx=10)  # Place the label on the left side with padding
 
     slider = Scale(slider_frame, from_=0, to=100, orient=HORIZONTAL, length=250, bg='#f0f0f0', troughcolor=fg_color, highlightthickness=0)
-    slider.pack(side='right')
-    slider.bind("<Motion>", update_function)
-    
-    return slider
+    # Create a horizontal slider with range 0 to 100, color and length settings
+    slider.pack(side='right')  # Place the slider to the right of the label
+    slider.bind("<Motion>", update_function)  # Bind the update function to the slider's motion event
 
-# Update functions for sliders
+    return slider  # Return the slider object
+
+# Functions to update each LED when the corresponding slider is adjusted
 def update_red(event):
-    update_color(red_slider, red)
+    update_color(red_slider, red)  # Call update_color with the red slider and red LED
 
 def update_green(event):
-    update_color(green_slider, green)
+    update_color(green_slider, green)  # Call update_color with the green slider and green LED
 
 def update_blue(event):
-    update_color(blue_slider, blue)
+    update_color(blue_slider, blue)  # Call update_color with the blue slider and blue LED
 
-# Initialize sliders with colors
-red_slider = create_slider("Red", red, update_red, '#ff4d4d')
-green_slider = create_slider("Green", green, update_green, '#4dff4d')
-blue_slider = create_slider("Blue", blue, update_blue, '#4d4dff')
+# Initialize sliders for each LED color with appropriate labels and colors
+red_slider = create_slider("Red", red, update_red, '#ff4d4d')  # Create slider for red LED
+green_slider = create_slider("Green", green, update_green, '#4dff4d')  # Create slider for green LED
+blue_slider = create_slider("Blue", blue, update_blue, '#4d4dff')  # Create slider for blue LED
 
-# Separator line for visual grouping
+# Function to create a separator line (for visual grouping between elements)
 def create_separator():
-    separator = Frame(main_frame, height=2, bd=1, bg='#cccccc')
-    separator.pack(fill='x', pady=10)
+    separator = Frame(main_frame, height=2, bd=1, bg='#cccccc')  # Create a frame that acts as a separator
+    separator.pack(fill='x', pady=10)  # Fill the width and add padding
 
-# Add separators between sliders for better grouping
-create_separator()
-create_separator()
+# Add separators between sliders for better visual grouping
+create_separator()  # Add separator after first slider
+create_separator()  # Add another separator
 
-# Create 'Turn Off LEDs' button
+# Function to turn off all LEDs by setting their values to 0
 def turn_off_leds():
-    red.off()
-    green.off()
-    blue.off()
+    red.off()   # Turn off the red LED
+    green.off()  # Turn off the green LED
+    blue.off()  # Turn off the blue LED
 
+# Create a button to turn off all LEDs
 turn_off_button = Button(main_frame, text="Turn Off LEDs", font=label_font, bg='#ff6666', fg='white', command=turn_off_leds, relief='flat', padx=10, pady=5)
-turn_off_button.pack(pady=20)
+# Button settings: red background, white text, and padding
+turn_off_button.pack(pady=20)  # Place button and add vertical padding
 
-# Close function
+# Function to handle closing the window
 def close():
-    # Turn off LEDs before closing
-    turn_off_leds()
-    window.destroy()
+    turn_off_leds()  # Turn off all LEDs before closing the window
+    window.destroy()  # Destroy the window and exit the application
 
-# Set close protocol
+# Set protocol to handle window close button click (calls the close function)
 window.protocol("WM_DELETE_WINDOW", close)
 
-# Start main loop
+# Start the Tkinter event loop to display the window and handle user interactions
 window.mainloop()
